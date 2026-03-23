@@ -5,7 +5,7 @@
 ## 使い方
 
 ブラウザで以下のURLを開くだけで使えます。
-https://wowing8738-coder.github.io/illust-quest/
+https://patyopeta.github.io/illust-quest/
 
 ## 特徴
 
