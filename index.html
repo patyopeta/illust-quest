@@ -57,6 +57,41 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'M PLUS
 body{display:flex;justify-content:center}
 #app{width:100%;max-width:480px;min-height:100vh;display:flex;flex-direction:column}
 
+/* ===== PC LAYOUT ===== */
+#pc-left,#pc-right{display:none}
+@media(min-width:1024px){
+  body{padding:0;align-items:flex-start}
+  #app{max-width:100%;min-height:100vh;display:grid;grid-template-rows:auto auto 1fr;grid-template-columns:260px 1fr 280px;grid-template-areas:'hdr hdr hdr' 'nav nav nav' 'left main right'}
+  #header{grid-area:hdr}
+  #nav{grid-area:nav}
+  #nav .nav-btn[data-tab="works"],#nav .nav-btn[data-tab="status"]{display:none}
+  #content{grid-area:main;overflow-y:auto;padding:20px 24px 40px;max-height:calc(100vh - 130px)}
+  #pc-left{grid-area:left;display:block;overflow-y:auto;padding:16px 12px 40px;border-right:2px solid var(--border);background:var(--bg2);max-height:calc(100vh - 130px);transition:background .3s}
+  #pc-right{grid-area:right;display:block;overflow-y:auto;padding:16px 12px 40px;border-left:2px solid var(--border);background:var(--bg2);max-height:calc(100vh - 130px);transition:background .3s}
+  .sidebar-sec{font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:800;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+  .sidebar-sec:first-child{margin-top:0}
+  .sidebar-sec::after{content:'';flex:1;height:2px;background:var(--border);border-radius:99px}
+  .work-item-sm{background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+  .work-item-sm:hover{border-color:var(--primary);background:var(--primary-lt)}
+  .work-item-sm:active{transform:scale(.97)}
+  .work-item-sm.posted{opacity:.5}
+  .wsm-title{font-size:12px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+  .wsm-badge{font-size:9px;font-weight:800;color:var(--primary);background:var(--primary-lt);border:1px solid var(--border2);border-radius:99px;padding:1px 7px;display:inline-block}
+  .wsm-badge.posted{color:var(--green);background:var(--green-lt);border-color:var(--green)}
+  .steps-sm{display:flex;gap:3px;margin-top:5px}
+  .step-sm{flex:1;height:4px;background:var(--bg4);border-radius:99px}
+  .step-sm.done{background:var(--primary)}
+  .step-sm.cur{background:var(--primary);opacity:.4}
+  #rank-card-big{padding:14px;margin-bottom:10px}
+  .rc-name{font-size:18px}
+  .stat-card{padding:10px}
+  .stat-num{font-size:20px}
+  .pc-graph-mini{background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px;margin-top:12px}
+  .pc-graph-mini-title{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:1px;margin-bottom:8px}
+  #panel-today .today-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  #panel-today .today-grid>*{min-width:0}
+}
+
 /* LEVELUP */
 #lvup{display:none;position:fixed;inset:0;z-index:900;background:rgba(108,63,255,.93);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
 #lvup.show{display:flex;animation:fdin .4s ease}
@@ -323,6 +358,16 @@ canvas.chart{display:block;width:100%;border-radius:8px}
   <button class="nav-btn" data-tab="status">STATUS</button>
 </div>
 
+<!-- PC LEFT SIDEBAR -->
+<div id="pc-left">
+  <div class="sidebar-sec">作品一覧</div>
+  <div class="form-row" style="margin-bottom:10px">
+    <input class="inp" id="pc-work-input" placeholder="タイトルを入力..." style="font-size:12px"/>
+    <button class="act-btn sm" onclick="addWorkPC()" style="white-space:nowrap;margin-left:4px;font-size:11px">追加</button>
+  </div>
+  <div id="pc-work-list"></div>
+</div>
+
 <!-- CONTENT -->
 <div id="content">
 
@@ -399,6 +444,41 @@ canvas.chart{display:block;width:100%;border-radius:8px}
     <div class="sec" style="margin-top:14px">行動ログ（直近7日）</div>
     <div id="day-log-list"></div>
   </div>
+</div>
+
+<!-- PC RIGHT SIDEBAR -->
+<div id="pc-right">
+  <div id="pc-rank-card" style="background:var(--hdr);border-radius:14px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
+    <div style="font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.6);font-weight:800;margin-bottom:3px">RANK</div>
+    <div style="font-size:18px;font-weight:900;color:#fff" id="pc-rank-name">見習い絵師</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:700;margin-top:1px" id="pc-rank-sub">LV.1 · 0 XP</div>
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:99px;margin-top:10px;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,#ffd700,#fff);border-radius:99px;transition:width .8s" id="pc-xp-bar"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+    <div style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:900;color:var(--primary)" id="pc-s-posts">0</div>
+      <div style="font-size:9px;color:var(--text3);font-weight:800;margin-top:2px">投稿数</div>
+    </div>
+    <div style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:900;color:var(--primary)" id="pc-s-days">0日</div>
+      <div style="font-size:9px;color:var(--text3);font-weight:800;margin-top:2px">継続日数</div>
+    </div>
+    <div style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:900;color:var(--primary)" id="pc-s-time">0h</div>
+      <div style="font-size:9px;color:var(--text3);font-weight:800;margin-top:2px">制作時間</div>
+    </div>
+    <div style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:900;color:var(--primary)" id="pc-s-works">0</div>
+      <div style="font-size:9px;color:var(--text3);font-weight:800;margin-top:2px">制作作品数</div>
+    </div>
+  </div>
+  <div class="sidebar-sec">実績</div>
+  <div id="pc-achievements"></div>
+  <div class="sidebar-sec" style="margin-top:14px">ランク</div>
+  <div id="pc-rank-table"></div>
 </div>
 
 <!-- WORK MODAL -->
@@ -529,6 +609,7 @@ function renderHeader(){
   document.getElementById('xp-fill').style.width=info.pct+'%';
   const pi=document.getElementById('profile-icon');
   pi.innerHTML=(S.profile?.icon)?'<img src="'+S.profile.icon+'" alt="i"/>':'🎨';
+  renderPCRight();
 }
 
 // ===== TIMER =====
@@ -617,6 +698,7 @@ function renderToday(){
   }
   el.innerHTML=h;
   const td=document.getElementById('timer-display');if(td)td.textContent=fmt(_ts);
+  setTimeout(wrapTodayForPC,50);
 }
 
 function updateStreak(){const t=todayStr();if(S.lastActiveDate===t)return;const y=new Date();y.setDate(y.getDate()-1);S.streakDays=S.lastActiveDate===y.toDateString()?(S.streakDays||0)+1:1;S.lastActiveDate=t;}
@@ -658,6 +740,7 @@ function renderWorks(){
   if(inProg.length)h+='<div class="group-hdr">制作中（'+inProg.length+'）</div>'+inProg.map(rw).join('');
   if(posted.length)h+='<div class="group-hdr" style="margin-top:8px">投稿済み（'+posted.length+'）</div>'+posted.map(rw).join('');
   list.innerHTML=h;
+  renderPCLeft();
 }
 
 function addWork(){const inp=document.getElementById('work-input');const t=inp.value.trim();if(!t)return;S.works.unshift({id:Date.now()+'',title:t,stepIdx:0,createdDate:todayISO(),timeLog:[],totalMin:0,feedbacks:[],posted:false});inp.value='';save();renderWorks();renderToday();toast('作品を追加しました！');}
@@ -1006,12 +1089,98 @@ function scheduleNotif(){
   },60000);
 }
 
+// ===== PC DETECTION =====
+function isPC(){return window.innerWidth>=1024;}
+
+// ===== PC SIDEBAR RENDERS =====
+function renderPCLeft(){
+  if(!isPC())return;
+  const list=document.getElementById('pc-work-list');
+  const inProg=S.works.filter(w=>!w.posted);
+  const posted=S.works.filter(w=>w.posted);
+  if(!S.works.length){list.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px 0;font-weight:700">作品を追加しましょう</div>';return;}
+  function rw(w){
+    var cls='work-item-sm'+(w.posted?' posted':'');
+    var badge=w.posted?'済':STEPS[w.stepIdx].slice(0,2);
+    var bCls='wsm-badge'+(w.posted?' posted':'');
+    var stps=STEPS.map(function(_,i){return '<div class="step-sm '+(i<w.stepIdx||w.posted?'done':i===w.stepIdx?'cur':'')+'" ></div>';}).join('');
+    var oid=w.id;return ['<div class="',cls,'" onclick="openModal(\'',oid,'\')" style="cursor:pointer">','<div style="display:flex;justify-content:space-between;align-items:center;gap:6px">','<div class="wsm-title">',esc(w.title),'</div>','<div class="',bCls,'">',badge,'</div></div>','<div class="steps-sm">',stps,'</div></div>'].join('');
+  }
+  var h='';
+  if(inProg.length)h+='<div style="font-size:9px;color:var(--text3);font-weight:800;letter-spacing:1px;margin-bottom:6px">制作中（'+inProg.length+'）</div>'+inProg.map(rw).join('');
+  if(posted.length)h+='<div style="font-size:9px;color:var(--text3);font-weight:800;letter-spacing:1px;margin:10px 0 6px">投稿済み（'+posted.length+'）</div>'+posted.map(rw).join('');
+  list.innerHTML=h;
+}
+
+function renderPCRight(){
+  if(!isPC())return;
+  const info=getRank(S.xp);
+  const p=S.profile||{};
+  document.getElementById('pc-rank-name').textContent=p.name||info.r.name;
+  document.getElementById('pc-rank-sub').textContent='LV.'+info.r.lv+' · '+S.xp+' XP';
+  document.getElementById('pc-xp-bar').style.width=info.pct+'%';
+  const posted=S.works.filter(w=>w.posted);
+  const totalMin=S.works.reduce((a,w)=>a+(w.totalMin||0),0);
+  document.getElementById('pc-s-posts').textContent=posted.length;
+  document.getElementById('pc-s-days').textContent=(S.streakDays||0)+'日';
+  document.getElementById('pc-s-time').textContent=Math.floor(totalMin/60)+'h';
+  document.getElementById('pc-s-works').textContent=S.works.length;
+  // achievements
+  const tlx=posted.reduce((a,w)=>a+(w.likesX||0),0);
+  const tlp=posted.reduce((a,w)=>a+(w.likesPix||0),0);
+  const doneTodos=(S.todos||[]).filter(t=>t.done).length;
+  const allTodos=(S.todos||[]).length;
+  const ach=[
+    {icon:'🖼️',title:posted.length+' 枚投稿'},
+    {icon:'💙',title:'X ♥ '+tlx},
+    {icon:'💜',title:'pix ♥ '+tlp},
+    {icon:'🔥',title:(S.streakDays||0)+' 日連続'},
+    {icon:'✅',title:doneTodos+'/'+allTodos+' ToDo'},
+  ];
+  document.getElementById('pc-achievements').innerHTML=ach.map(a=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:2px solid var(--border);font-size:12px;font-weight:800"><span style="font-size:16px;width:22px">'+a.icon+'</span>'+a.title+'</div>').join('');
+  // rank table
+  document.getElementById('pc-rank-table').innerHTML=RANKS.map(r=>{
+    const u=S.xp>=r.xp,c=r.lv===info.r.lv;
+    return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:2px solid var(--border);opacity:'+(u?1:0.3)+'"><div style="display:flex;gap:6px"><span style="font-size:9px;color:var(--text3);font-weight:800;width:28px">LV.'+r.lv+'</span><span style="font-size:11px;font-weight:'+(c?900:700)+';color:'+(c?'var(--primary)':'var(--text)')+'">'+r.name+(c?' ◀':'')+'</span></div><span style="font-size:10px;color:var(--text3);font-weight:700">'+r.xp.toLocaleString()+'</span></div>';
+  }).join('');
+}
+
+function addWorkPC(){
+  const inp=document.getElementById('pc-work-input');
+  const t=inp.value.trim();if(!t)return;
+  S.works.unshift({id:Date.now()+'',title:t,stepIdx:0,createdDate:todayISO(),timeLog:[],totalMin:0,feedbacks:[],posted:false});
+  inp.value='';save();renderWorks();renderPCLeft();renderToday();toast('作品を追加しました！');
+}
+
+// ===== PC TODAY: wrap in grid on PC =====
+function wrapTodayForPC(){
+  if(!isPC())return;
+  const body=document.getElementById('today-body');
+  if(!body||body.querySelector('.today-grid'))return;
+  // Wrap into 2-col grid: left=todo+illust, right=mini graph
+  const existing=body.innerHTML;
+  const mini='<div class="pc-graph-mini"><div class="pc-graph-mini-title">📊 いいね数グラフ</div><canvas id="pc-mini-canvas" style="width:100%;border-radius:8px" height="160"></canvas></div>';
+  body.innerHTML='<div class="today-grid"><div>'+existing+'</div><div>'+mini+'</div></div>';
+  // draw mini graph
+  setTimeout(()=>{
+    const posted=S.works.filter(w=>w.posted).sort((a,b)=>a.postedDate.localeCompare(b.postedDate));
+    if(!posted.length){document.getElementById('pc-mini-canvas').style.display='none';document.querySelector('.pc-graph-mini').innerHTML+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:12px;font-weight:700">投稿後にグラフが表示されます</div>';return;}
+    drawBarChart('pc-mini-canvas',posted.map(w=>w.title.length>5?w.title.slice(0,5)+'…':w.title),posted.map(w=>w.likesX||0),posted.map(w=>w.likesPix||0),'X','pixiv','#3b82f6','#a070e0');
+  },100);
+}
+
+// Resize handler
+window.addEventListener('resize',()=>{
+  if(isPC()){renderPCLeft();renderPCRight();}
+});
+
 // ===== INIT =====
 S.profile=S.profile||{name:'',bio:'',icon:''};
 S.bigGoals=S.bigGoals||[];
 S.todos=S.todos||[];
 applyTheme(S.theme||'light');
 renderHeader();renderToday();renderWorks();renderGoals();renderRecord();renderStatus();
+if(isPC()){renderPCLeft();renderPCRight();}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 scheduleNotif();
 </script>
